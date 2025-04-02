@@ -99,6 +99,7 @@ class OptimConfig:
 class ReIDDatasetConfig:
     """Re-Identification Dataset configuration template."""
 
+    dataset_dir: Optional[str] = STR_FIELD(value=None, description="Directory for the dataset.", display_name="Dataset Directory")
     train_dataset_dir: Optional[str] = STR_FIELD(value=None, description="Directory for the training dataset.", display_name="Training Dataset Directory")
     test_dataset_dir: Optional[str] = STR_FIELD(value=None, description="Directory for the testing dataset.", display_name="Testing Dataset Directory")
     query_dataset_dir: Optional[str] = STR_FIELD(value=None, description="Directory for the query dataset.", display_name="Query Dataset Directory")

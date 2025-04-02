@@ -21,7 +21,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 import torch.backends.cudnn as cudnn
 
 from nvidia_tao_pytorch.core.cookbooks.tlt_pytorch_cookbook import TLTPyTorchCookbook
-import nvidia_tao_pytorch.core.loggers.api_logging as status_logging
+# import nvidia_tao_pytorch.core.loggers.api_logging as status_logging
 from nvidia_tao_pytorch.core.mlops import check_wandb_logged_in, initialize_wandb
 from nvidia_tao_pytorch.core.tlt_logging import logging
 from nvidia_tao_pytorch.core.utilities import check_and_create, get_latest_checkpoint
@@ -60,10 +60,10 @@ def initialize_train_experiment(cfg, key=None):
     if resume_ckpt:
         if resume_ckpt.endswith('.tlt') or resume_ckpt.endswith('.pth'):
             logging.info(f"Setting resume checkpoint to {resume_ckpt}")
-            status_logging.get_status_logger().write(
-                message=f"Resuming training from checkpoint: {resume_ckpt}",
-                status_level=status_logging.Status.RUNNING
-            )
+            # status_logging.get_status_logger().write(
+            #     message=f"Resuming training from checkpoint: {resume_ckpt}",
+            #     status_level=status_logging.Status.RUNNING
+            # )
         else:
             raise ValueError("Resume checkpoint has an invalid file format; it must be either a .tlt or a .pth")
 
@@ -102,9 +102,9 @@ def initialize_evaluation_experiment(cfg, key=None):
 
     model_path = cfg["evaluate"]["checkpoint"]
 
-    status_logging.get_status_logger().write(
-        message=f"Loading checkpoint: {model_path}",
-        status_level=status_logging.Status.RUNNING)
+    # status_logging.get_status_logger().write(
+    #     message=f"Loading checkpoint: {model_path}",
+    #     status_level=status_logging.Status.RUNNING)
 
     # This env var is set in the common entrypoint to be consistent with num_gpus and gpu_ids
     gpus = [int(gpu) for gpu in os.environ['TAO_VISIBLE_DEVICES'].split(',')]
@@ -125,10 +125,10 @@ def initialize_inference_experiment(cfg, key=None):
 
     model_path = cfg["inference"]["checkpoint"]
 
-    status_logging.get_status_logger().write(
-        message=f"Loading checkpoint: {model_path}",
-        status_level=status_logging.Status.RUNNING
-    )
+    # status_logging.get_status_logger().write(
+    #     message=f"Loading checkpoint: {model_path}",
+    #     status_level=status_logging.Status.RUNNING
+    # )
 
     # This env var is set in the common entrypoint to be consistent with num_gpus and gpu_ids
     gpus = [int(gpu) for gpu in os.environ['TAO_VISIBLE_DEVICES'].split(',')]

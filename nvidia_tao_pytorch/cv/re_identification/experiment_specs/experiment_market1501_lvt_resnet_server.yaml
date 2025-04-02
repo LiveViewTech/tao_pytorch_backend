@@ -1,0 +1,96 @@
+results_dir: "/home/sidd.gotad/Projects/ml_training/tao_pytorch_backend/results/reid_cnn"
+encryption_key: nvidia_tao
+model:
+  backbone: resnet_50
+  last_stride: 1
+  pretrain_choice: imagenet
+  pretrained_model_path: "/home/sidd.gotad/models/nvidia_resnet50_200821.pth.tar"
+  input_channels: 3
+  input_width: 128
+  input_height: 256
+  neck: bnneck
+  feat_dim: 256
+  neck_feat: after
+  metric_loss_type: triplet
+  with_center_loss: False
+  with_flip_feature: False
+  label_smooth: True
+dataset:
+  dataset_dir: "/home/sidd.gotad/Market-1501-lvt-combined"
+#  train_dataset_dir: "/home/sidd.gotad/Market-1501-v15.09.15/bounding_box_train"
+#  test_dataset_dir: "/home/sidd.gotad/Market-1501-v15.09.15/bounding_box_test"
+#  query_dataset_dir: "/home/sidd.gotad/Market-1501-v15.09.15/query"
+  train_dataset_dir: "/home/sidd.gotad/Market-1501-lvt-combined/bounding_box_train"
+  test_dataset_dir: "/home/sidd.gotad/Market-1501-lvt-combined/bounding_box_test"
+  query_dataset_dir: "/home/sidd.gotad/Market-1501-lvt-combined/query"
+#  train_dataset_dir: "/home/sidd.gotad/Evaluation_Dataset/reid_dataset/train"
+#  test_dataset_dir: "/home/sidd.gotad/Evaluation_Dataset/reid_dataset/test"
+#  query_dataset_dir: "/home/sidd.gotad/Evaluation_Dataset/reid_dataset/query"
+  num_classes: 755
+  batch_size: 64
+  val_batch_size: 128
+  num_workers: 8
+  pixel_mean: [0.485, 0.456, 0.406]
+  pixel_std: [0.226, 0.226, 0.226]
+  padding: 10
+  prob: 0.5
+  re_prob: 0.5
+  sampler: softmax_triplet
+  num_instances: 4
+re_ranking:
+  re_ranking: False
+  k1: 20
+  k2: 6
+  lambda_value: 0.2
+train:
+#  resume_training_checkpoint_path: "${results_dir}/train_mkt1501_lvt/reid_model_epoch=119-v2.tlt"
+  results_dir: "${results_dir}/train_mkt1501_lvt"
+  optim:
+    name: Adam
+    lr_steps: [40, 70]
+    gamma: 0.1
+    bias_lr_factor: 1
+    weight_decay: 0.0005
+    weight_decay_bias: 0.0005
+    warmup_factor: 0.01
+    warmup_iters: 10
+    warmup_method: linear
+    base_lr: 0.00035
+    momentum: 0.9
+    center_loss_weight: 0.0005
+    center_lr: 0.5
+    triplet_loss_margin: 0.3
+  num_epochs: 200
+  checkpoint_interval: 10
+inference:
+  results_dir: "${results_dir}/inference"
+  checkpoint: "???"
+  output_file: "???"
+  test_dataset: "???"
+  query_dataset: "???"
+evaluate:
+  results_dir: "${results_dir}/evaluate"
+#  checkpoint: "${results_dir}/train_mkt1501_lvt/reid_model_epoch=199.tlt"
+  output_sampled_matches_plot: "${results_dir}/evaluate/sampled_matches_plot"
+  output_cmc_curve_plot: "${results_dir}/evaluate/cmc_curve"
+#  test_dataset: "/home/sidd.gotad/Market-1501-v15.09.15/bounding_box_test"
+#  query_dataset: "/home/sidd.gotad/Market-1501-v15.09.15/query"
+  test_dataset: "/home/sidd.gotad/lvt_reid_dataset/test"
+  query_dataset: "/home/sidd.gotad/lvt_reid_dataset/query"
+#  test_dataset: "/home/sidd.gotad/Market-1501-lvt-combined/bounding_box_test"
+#  query_dataset: "/home/sidd.gotad/Market-1501-lvt-combined/query"
+export:
+  results_dir: "${results_dir}/export"
+  checkpoint: "${results_dir}/reid_model_epoch=119.tlt"
+
+wandb:
+  enable: True
+  project: "local-reid-pytorch"
+  tags:
+    - "ResNet50"
+    - "Market1501"
+    - "LVT_v1"
+  reinit: False
+  sync_tensorboard: False
+  save_code: False
+  name: "ResNet50 default"
