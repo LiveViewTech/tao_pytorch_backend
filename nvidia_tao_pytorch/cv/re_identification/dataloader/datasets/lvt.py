@@ -12,23 +12,24 @@ from nvidia_tao_pytorch.cv.re_identification.dataloader.datasets.bases import Ba
 from ultralytics import YOLO
 
 
-class LVTReID(BaseImageDataset):
-    """Custom class for the LVTReID dataset.
+class LVTReIDDataset(BaseImageDataset):
+    """Custom class for the LVTReIDDataset dataset.
 
-    This class provides an interface to the LVTReID dataset and inherits from the BaseImageDataset class.
+    This class provides an interface to the LVTReIDDataset dataset and inherits from the BaseImageDataset class.
 
     """
 
-    def __init__(self, experiment_spec, prepare_for_training, verbose=False):
-        """Initialize the LVTReID dataset.
+    def __init__(self, experiment_spec, prepare_for_training, create_dataset=False, yolo_pose_model=None,  verbose=False):
+        """Initialize the LVTReIDDataset dataset.
 
         Args:
             experiment_spec (dict): Specification of the experiment.
             prepare_for_training (bool): If True, prepare the dataset for training.
+            create_dataset (bool): If True, create the dataset.
             verbose (bool, optional): If True, print verbose information. Defaults to False.
 
         """
-        super(LVTReID, self).__init__()
+        super(LVTReIDDataset, self).__init__()
         self.prepare_for_training = prepare_for_training
 
         self.dataset_dir = experiment_spec["dataset"]["dataset_dir"]
@@ -45,11 +46,14 @@ class LVTReID(BaseImageDataset):
             self.gallery_dir = experiment_spec["evaluate"]["test_dataset"]
         self._check_before_run()
 
-        self.crops_dir = os.path.join(self.dataset_dir, "reid_dataset", "crops")
-        # if len(os.listdir(self.crops_dir)) == 0:
-        #     self._create_crops()
-        # if len(os.listdir(self.gallery_dir)) == 0:
-        #     self._redistribute_crops()
+        self.yolo_pose_model = None
+        if create_dataset:
+            self.yolo_pose_model = yolo_pose_model
+            self.crops_dir = os.path.join(self.dataset_dir, "reid_dataset", "crops")
+            if len(os.listdir(self.crops_dir)) == 0:
+                self._create_crops()
+            if len(os.listdir(self.gallery_dir)) == 0:
+                self._redistribute_crops()
 
         query = self._process_dir(self.query_dir, relabel=False)
         gallery = self._process_dir(self.gallery_dir, relabel=False)
@@ -80,6 +84,7 @@ class LVTReID(BaseImageDataset):
             raise FileNotFoundError("'{}' is not available".format(self.gallery_dir))
 
     def _create_crops(self):
+        assert os.path.exists(self.yolo_pose_model)
         if not os.path.isdir(self.crops_dir):
             os.mkdir(self.crops_dir)
         object_key_name_map = {}
@@ -87,7 +92,7 @@ class LVTReID(BaseImageDataset):
         scene_person_ids = {}
         # Load a model
         scene_id = 0
-        pose_model = YOLO("/home/sidd/Downloads/yolov8x-pose-p6.pt")  # load an official model
+        pose_model = YOLO(self.yolo_pose_model)  # load an official model
         for data_dir in glob.glob(os.path.join(self.dataset_dir, "dataset_*")):
             if os.path.isdir(data_dir):
                 video_dir = os.path.join(data_dir, "video")
