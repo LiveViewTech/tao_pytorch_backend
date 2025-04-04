@@ -20,7 +20,7 @@ import json
 import logging
 import os
 
-from nvidia_tao_core.cloud_handlers.utils import status_callback
+# from nvidia_tao_core.cloud_handlers.utils import status_callback
 
 from torch import distributed as torch_distributed
 from pytorch_lightning.utilities import rank_zero_only, rank_zero_warn
@@ -211,7 +211,7 @@ class BaseLogger(object):
                 data["kpi"] = self.kpi
 
             data_string = self.format_data(data)
-            status_callback(data_string)
+            # status_callback(data_string)
             self.log(verbosity_level, data_string)
             self.flush()
 

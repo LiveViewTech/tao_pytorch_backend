@@ -17,6 +17,7 @@ import os
 import torch
 from torch.utils.data import DataLoader
 from nvidia_tao_pytorch.cv.re_identification.dataloader.datasets.market1501 import Market1501
+from nvidia_tao_pytorch.cv.re_identification.dataloader.datasets.lvt import LVTReIDDataset
 from nvidia_tao_pytorch.cv.re_identification.dataloader.sampler import RandomIdentitySampler, RandomIdentitySamplerDDP
 from nvidia_tao_pytorch.cv.re_identification.dataloader.datasets.bases import ImageDataset
 from nvidia_tao_pytorch.cv.re_identification.dataloader.transforms import build_transforms
@@ -101,7 +102,9 @@ def build_dataloader(cfg, is_train):
     val_transforms = build_transforms(cfg, is_train=False)
     num_gpus = len(cfg["train"]["gpu_ids"])
     num_workers = cfg["dataset"]["num_workers"] * num_gpus
-    dataset = Market1501(cfg, is_train)
+    create_dataset = cfg["dataset"].get("create_dataset", False)
+    yolo_pose_model = cfg["dataset"].get("yolo_pose_model", None)
+    dataset = LVTReIDDataset(cfg, is_train, create_dataset, yolo_pose_model)
     train_loader, val_loader = None, None
     if is_train:
         train_transforms = build_transforms(cfg, is_train=True)
